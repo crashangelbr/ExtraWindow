@@ -1,0 +1,22 @@
+{
+    "FileVersion" : 3,
+
+    "FriendlyName" : "Extra Cam Window Plugin",
+    "Version" : 1,
+    "FriendlyVersion" : "1.0",
+    "Description" : "A simple plugin that allows to have extra game windows with their own camera viewpoints.",
+    "Category" : "Camera",
+	"CreatedBy" : "Sebastian Plesch",
+	"CreatedByURL" : "http://github.com/chaosgrid",
+	"DocsURL" : "http://github.com/chaosgrid/ExtraWindow",
+	
+	"CanContainContent" : "true",
+
+    "Modules" :
+    [
+        {
+            "Name" : "ExtraWindow",
+            "Type" : "Runtime"
+        }
+    ]
+}
