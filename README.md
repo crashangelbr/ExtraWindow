@@ -13,11 +13,13 @@ Original code developer by Schlabbermampf in forum post https://forums.unrealeng
 
 I Change  HackFix original code to using in plugin...
 
+    - Create New Unreal Engine Project (C++)
     - Copy PlugIn Folder in your project 
-	- Open Unreal Editor and in Content Browse > View Option > Select Show PlugIn Content....
-	- In Main Window click in Edit > Project Settings > Maps & Modes
-	- Select Application in Editor Startup Map & Game Default Map
-	- Select ExtraWindowGameInstance in GameInstanceClass
+    - Build
+    - Open Unreal Editor and in Content Browse > View Option > Select Show PlugIn Content....
+    - In Main Window click in Edit > Project Settings > Maps & Modes
+    - Select Application in Editor Startup Map & Game Default Map
+    - Select ExtraWindowGameInstance in GameInstanceClass
 	
 	Close Unreal Editor and Open again...
 	
