@@ -14,7 +14,7 @@ Original code developer by Schlabbermampf in forum post https://forums.unrealeng
 I Change  HackFix original code to using in plugin...
 
     - Create New Unreal Engine Project (C++)
-    - Copy PlugIn Folder in your project 
+    - Create PlugIns Folder and copy this files to subfolder named ExtraWindow in your project 
     - Build
     - Open Unreal Editor and in Content Browse > View Option > Select Show PlugIn Content....
     - In Main Window click in Edit > Project Settings > Maps & Modes
