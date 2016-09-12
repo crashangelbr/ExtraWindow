@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "IExtraWindowPlugin.h"
 #include "ExtraWindowGameManager.h"
 #include "EngineModule.h"
@@ -44,6 +42,13 @@ void AExtraWindowGameManager::Tick(float DeltaTime)
 	}
 
 }
+void Log(FString Message, bool ShowScreen)
+{
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *Message);
+	if (ShowScreen) {
+		GEngine->AddOnScreenDebugMessage(-1, 22.0f, FColor::Yellow, *Message);
+	}
+}
 
 
 void AExtraWindowGameManager::ShowGameWindow()
@@ -69,6 +74,7 @@ void AExtraWindowGameManager::ShowGameWindow()
 		//do the reshape if neccesary
 		if (GameWindow.Pin()->GetSizeInScreen().X != GameWindowSize.X)
 		{
+			Log(FString::SanitizeFloat(GameWindow.Pin()->GetSizeInScreen().X), true);
 			GameWindow.Pin()->ReshapeWindow(GameWindowLocation, GameWindowSize);
 		}
 	}
@@ -79,14 +85,15 @@ void AExtraWindowGameManager::HideGameWindow()
 
 	if (GameWindow.IsValid())
 	{
-		// if the game-window is in shown-mode, set it in hidden-mode
+		UExtraWindowUI::GetResolutionMonitor(true, GameWindowLocation, GameWindowSize);
+
 		if (bGameWindowShown)
 		{
 			GameWindowHiddenWidget->AddToViewport(0);
 
 			SetGraphicsQuality(0);
 
-			FSystemResolution::RequestResolutionChange(100, 100, EWindowMode::WindowedFullscreen);
+			FSystemResolution::RequestResolutionChange(GameWindowSize.X, GameWindowSize.Y, EWindowMode::WindowedFullscreen);
 
 			GEngine->GetFirstLocalPlayerController(GetWorld())->SetPause(true);
 
@@ -95,10 +102,8 @@ void AExtraWindowGameManager::HideGameWindow()
 
 		//set reshape of the game window if size not proper to hidden-mode
 		bool bReshapeWindow = false;
-		if (GameWindow.Pin()->GetSizeInScreen().X != 150)
+		if (GameWindow.Pin()->GetSizeInScreen().X != GameWindowSize.X)
 		{
-			GameWindowSize.X = 150;
-			GameWindowSize.Y = 150;
 			bReshapeWindow = true;
 		}
 
@@ -111,10 +116,6 @@ void AExtraWindowGameManager::HideGameWindow()
 			}
 			else
 			{
-				int32 x, y, w, h = 0;
-				GameWindow.Pin()->GetNativeWindow()->GetFullScreenInfo(x, y, w, h);
-				GameWindowLocation.X = x;
-				GameWindowLocation.Y = y;
 				bGameWindowDragged = false;
 			}
 			bReshapeWindow = true;
@@ -125,7 +126,6 @@ void AExtraWindowGameManager::HideGameWindow()
 		{
 			GameWindow.Pin()->ReshapeWindow(GameWindowLocation, GameWindowSize);
 		}
-
 	}
 }
 
