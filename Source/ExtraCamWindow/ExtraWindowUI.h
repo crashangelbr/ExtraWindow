@@ -41,6 +41,8 @@ public:
 
 private:
 
+	bool isEditor = false;
+
 	UGameViewportClient* ExtraWindowViewportClient;
 	TSharedPtr<FSceneViewport> ExtraWindowSceneViewport;
 	FNumberFormattingOptions NumberFormat;

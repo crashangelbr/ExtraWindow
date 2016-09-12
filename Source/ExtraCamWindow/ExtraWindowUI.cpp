@@ -41,6 +41,10 @@ void UExtraWindowUI::GetResolutionMonitor(bool isNoMainViewport, FVector2D& Posi
 
 UExtraWindowUI::UExtraWindowUI(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+#if WITH_EDITOR
+	isEditor = true;
+#endif
+
 	//set Float precision for displaying values
 	NumberFormat.MinimumIntegralDigits = 1;
 	NumberFormat.MaximumIntegralDigits = 11111111;
@@ -51,7 +55,10 @@ UExtraWindowUI::UExtraWindowUI(const FObjectInitializer& ObjectInitializer) : Su
 void UExtraWindowUI::CloseExtraWindowUI() {
 	if (ExtraWindowViewportClient != nullptr) {
 		ExtraWindowViewportClient->GetWindow()->DestroyWindowImmediately();
-		GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
+		
+		if (!isEditor) {
+			GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
+		}
 	}
 }
 
@@ -95,7 +102,6 @@ bool UExtraWindowUI::CreateExtraWindowUI()
 			FSlateApplication::Get().AddWindow(Window, false);
 			Window->SetViewportSizeDrivenByWindow(false);
 			Window->SetOnWindowClosed(FOnWindowClosed::CreateUObject(this, &UExtraWindowUI::OnExtraWindowWindowClosed));
-			//Window->SetRequestDestroyWindowOverride(FOnWindowClosed::CreateUObject(this, &UExtraWindowUI::OnExtraWindowWindowClosed));
 
 			// Attach the viewport client to a new viewport.
 			TSharedRef<SOverlay> ViewportOverlayWidgetRef = SNew(SOverlay);
@@ -162,6 +168,10 @@ void UExtraWindowUI::OnExtraWindowWindowClosed(const TSharedRef<SWindow>& Window
 
 	ExtraWindowViewportClient = NULL;
 	ExtraWindowSceneViewport = NULL;
+
+	if (isEditor) {
+		GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
+	}
 
 	UGameEngine* gameEngine = Cast<UGameEngine>(GEngine);
 	if (gameEngine)
