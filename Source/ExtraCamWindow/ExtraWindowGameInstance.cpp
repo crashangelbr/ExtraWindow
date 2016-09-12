@@ -10,14 +10,14 @@ void UExtraWindowUIGameInstance::InitializeExtraWindowUIContext(APlayerControlle
 	WorldContext->OwningGameInstance = this;
 	//WorldContext->RunAsDedicated = true;
 
-	// create a ExtraWindowUI world
-	UWorld* ExtraWindowUIWorld = UWorld::CreateWorld(EWorldType::None, false, "ExtraWindowUI");
+	// create a ExtraWindow world
+	UWorld* ExtraWindowWorld = UWorld::CreateWorld(EWorldType::None, false, "ExtraWindow");
 
-	ExtraWindowUIWorld->SetGameInstance(this);
-	GEngine->DestroyWorldContext(ExtraWindowUIWorld);
-	//WorldContext->SetCurrentWorld( ExtraWindowUIWorld );
+	ExtraWindowWorld->SetGameInstance(this);
+	GEngine->DestroyWorldContext(ExtraWindowWorld);
+	//WorldContext->SetCurrentWorld( ExtraWindowWorld );
 
-	ExtraWindowUIWorld->AddController(controller);
+	ExtraWindowWorld->AddController(controller);
 
 	Init();
 }

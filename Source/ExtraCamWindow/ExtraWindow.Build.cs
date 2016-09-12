@@ -6,6 +6,9 @@ public class ExtraWindow : ModuleRules
     {
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Slate", "SlateCore", "UMG" });
 
+        MinFilesUsingPrecompiledHeaderOverride = 1;
+        bFasterWithoutUnity = true;
+
         //Uncomment if you are using online features
         // PrivateDependencyModuleNames.Add("OnlineSubsystem");
         //if ((Target.Platform == UnrealTargetPlatform.Win32) || (Target.Platform == UnrealTargetPlatform.Win64))

@@ -49,28 +49,29 @@ UExtraWindowUI::UExtraWindowUI(const FObjectInitializer& ObjectInitializer) : Su
 }
 
 void UExtraWindowUI::CloseExtraWindowUI() {
-	if (ExtraWindowUIViewportClient != nullptr) {
-		ExtraWindowUIViewportClient->GetWindow()->DestroyWindowImmediately();
+	if (ExtraWindowViewportClient != nullptr) {
+		ExtraWindowViewportClient->GetWindow()->DestroyWindowImmediately();
+		GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
 	}
 }
 
 bool UExtraWindowUI::CreateExtraWindowUI()
 {
-	bExtraWindowUICreated = false;
+	bExtraWindowCreated = false;
 
 	if (GIsClient)
 	{
 		//Initialize GameInstance of new viewport client
-		UExtraWindowUIGameInstance* ExtraWindowUIGameInstance = NewObject<UExtraWindowUIGameInstance>(GEngine, UExtraWindowUIGameInstance::StaticClass());
-		ExtraWindowUIGameInstance->InitializeExtraWindowUIContext(GetWorld()->GetFirstPlayerController());
+		UExtraWindowUIGameInstance* ExtraWindowGameInstance = NewObject<UExtraWindowUIGameInstance>(GEngine, UExtraWindowUIGameInstance::StaticClass());
+		ExtraWindowGameInstance->InitializeExtraWindowUIContext(GetWorld()->GetFirstPlayerController());
 
 		//Initialize Viewport Client
-		ExtraWindowUIViewportClient = NewObject<UGameViewportClient>(GEngine, UGameViewportClient::StaticClass());
-		ExtraWindowUIViewportClient->Init(*ExtraWindowUIGameInstance->GetWorldContext(), ExtraWindowUIGameInstance);
+		ExtraWindowViewportClient = NewObject<UGameViewportClient>(GEngine, UGameViewportClient::StaticClass());
+		ExtraWindowViewportClient->Init(*ExtraWindowGameInstance->GetWorldContext(), ExtraWindowGameInstance);
 
-		ExtraWindowUIGameInstance->GetWorldContext()->GameViewport = ExtraWindowUIViewportClient;
+		ExtraWindowGameInstance->GetWorldContext()->GameViewport = ExtraWindowViewportClient;
 
-		if (ExtraWindowUIViewportClient)
+		if (ExtraWindowViewportClient)
 		{
 			UExtraWindowUI::GetResolutionMonitor(false, GameWindowLocation, GameWindowSize);
 
@@ -93,15 +94,15 @@ bool UExtraWindowUI::CreateExtraWindowUI()
 
 			FSlateApplication::Get().AddWindow(Window, false);
 			Window->SetViewportSizeDrivenByWindow(false);
-			Window->SetOnWindowClosed(FOnWindowClosed::CreateUObject(this, &UExtraWindowUI::OnExtraWindowUIClosed));
-			//Window->SetRequestDestroyWindowOverride(FOnWindowClosed::CreateUObject(this, &UExtraWindowUI::OnExtraWindowUIClosed));
+			Window->SetOnWindowClosed(FOnWindowClosed::CreateUObject(this, &UExtraWindowUI::OnExtraWindowWindowClosed));
+			//Window->SetRequestDestroyWindowOverride(FOnWindowClosed::CreateUObject(this, &UExtraWindowUI::OnExtraWindowWindowClosed));
 
 			// Attach the viewport client to a new viewport.
 			TSharedRef<SOverlay> ViewportOverlayWidgetRef = SNew(SOverlay);
 			ViewportOverlayWidgetRef->SetCursor(EMouseCursor::Default);
 
 			TSharedRef<SGameLayerManager> LayerManagerRef = SNew(SGameLayerManager)
-				.SceneViewport(ExtraWindowUIViewportClient->GetGameViewport())
+				.SceneViewport(ExtraWindowViewportClient->GetGameViewport())
 				.Visibility(EVisibility::Visible)
 				.UseScissor(true)
 				[
@@ -115,15 +116,15 @@ bool UExtraWindowUI::CreateExtraWindowUI()
 					LayerManagerRef
 				];
 
-			ExtraWindowUIViewportClient->SetViewportOverlayWidget(Window, ViewportOverlayWidgetRef);
-			ExtraWindowUIViewportClient->SetGameLayerManager(LayerManagerRef);
+			ExtraWindowViewportClient->SetViewportOverlayWidget(Window, ViewportOverlayWidgetRef);
+			ExtraWindowViewportClient->SetGameLayerManager(LayerManagerRef);
 
-			ExtraWindowUISceneViewport = MakeShareable(new FSceneViewport(ExtraWindowUIViewportClient, Viewport));
-			ExtraWindowUIViewportClient->Viewport = ExtraWindowUISceneViewport.Get();
-			Viewport->SetViewportInterface(ExtraWindowUISceneViewport.ToSharedRef());
+			ExtraWindowSceneViewport = MakeShareable(new FSceneViewport(ExtraWindowViewportClient, Viewport));
+			ExtraWindowViewportClient->Viewport = ExtraWindowSceneViewport.Get();
+			Viewport->SetViewportInterface(ExtraWindowSceneViewport.ToSharedRef());
 
-			FViewportFrame* ViewportFrame = ExtraWindowUISceneViewport.Get();
-			ExtraWindowUIViewportClient->SetViewportFrame(ViewportFrame);
+			FViewportFrame* ViewportFrame = ExtraWindowSceneViewport.Get();
+			ExtraWindowViewportClient->SetViewportFrame(ViewportFrame);
 
 			Window->SetContent(Viewport.ToSharedRef());
 
@@ -136,33 +137,31 @@ bool UExtraWindowUI::CreateExtraWindowUI()
 				[
 					UserSlateWidget.ToSharedRef()
 				];
-			ExtraWindowUIViewportClient->AddViewportWidgetContent(ViewportWidget, 10);
+			ExtraWindowViewportClient->AddViewportWidgetContent(ViewportWidget, 10);
 
-			ExtraWindowUIViewportClient->SetCaptureMouseOnClick(EMouseCaptureMode::NoCapture);
+			ExtraWindowViewportClient->SetCaptureMouseOnClick(EMouseCaptureMode::NoCapture);
 
-			//ExtraWindowUIViewportClient->bDisableWorldRendering = true;
-			//ExtraWindowUISceneViewport->SetGameRenderingEnabled( false );
-			//ExtraWindowUISceneViewport->ProcessToggleFreezeCommand();
+			//ExtraWindowViewportClient->bDisableWorldRendering = true;
+			//ExtraWindowSceneViewport->SetGameRenderingEnabled( false );
+			//ExtraWindowSceneViewport->ProcessToggleFreezeCommand();
 			//FSlateApplication::Get().ReleaseMouseCapture();
 
 			Window->ShowWindow();
 		}
 	}
 
-	return bExtraWindowUICreated;
+	return bExtraWindowCreated;
 }
 
-void UExtraWindowUI::OnExtraWindowUIClosed(const TSharedRef<SWindow>& WindowBeingClosed)
+void UExtraWindowUI::OnExtraWindowWindowClosed(const TSharedRef<SWindow>& WindowBeingClosed)
 {
-	ExtraWindowUIViewportClient->CloseRequested(ExtraWindowUISceneViewport->GetViewport());
-	ExtraWindowUISceneViewport.Reset();
+	ExtraWindowViewportClient->CloseRequested(ExtraWindowSceneViewport->GetViewport());
+	ExtraWindowSceneViewport.Reset();
 
 	CloseExtraWindowUI();
 
-	ExtraWindowUIViewportClient = NULL;
-	ExtraWindowUISceneViewport = NULL;
-
-	GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
+	ExtraWindowViewportClient = NULL;
+	ExtraWindowSceneViewport = NULL;
 
 	UGameEngine* gameEngine = Cast<UGameEngine>(GEngine);
 	if (gameEngine)
@@ -173,17 +172,17 @@ void UExtraWindowUI::OnExtraWindowUIClosed(const TSharedRef<SWindow>& WindowBein
 		}
 	}
 
-	bExtraWindowUICreated = false;
+	bExtraWindowCreated = false;
 }
 
 void UExtraWindowUI::UpdateExtraWindowUI(float DeltaSeconds)
 {
-	if (ExtraWindowUISceneViewport->HasMouseCapture())
+	if (ExtraWindowSceneViewport->HasMouseCapture())
 		FSlateApplication::Get().ReleaseMouseCapture();
 
 
-	if (!ExtraWindowUIViewportClient->GetWindow()->IsViewportSizeDrivenByWindow())
-		ExtraWindowUIViewportClient->GetWindow()->SetViewportSizeDrivenByWindow(true);
+	if (!ExtraWindowViewportClient->GetWindow()->IsViewportSizeDrivenByWindow())
+		ExtraWindowViewportClient->GetWindow()->SetViewportSizeDrivenByWindow(true);
 }
 
 FText UExtraWindowUI::GetFloatAsTextWithPrecision(float inFloat)

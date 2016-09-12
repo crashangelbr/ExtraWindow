@@ -16,22 +16,22 @@ class UExtraWindowUI : public UUserWidget
 		UExtraWindowUI(const FObjectInitializer& ObjectInitializer);
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ExtraWindowUI")
-		bool bExtraWindowUICreated;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ExtraWindow")
+		bool bExtraWindowCreated;
 
-	UFUNCTION(BlueprintCallable, Category = "ExtraWindowUI")
+	UFUNCTION(BlueprintCallable, Category = "ExtraWindow")
 		bool CreateExtraWindowUI();
 
-	UFUNCTION(BlueprintCallable, Category = "ExtraWindowUI")
+	UFUNCTION(BlueprintCallable, Category = "ExtraWindow")
 		void UpdateExtraWindowUI(float DeltaSeconds);
 
-	UFUNCTION(BlueprintPure, Category = "ExtraWindowUI")
+	UFUNCTION(BlueprintPure, Category = "ExtraWindow")
 		FText GetFloatAsTextWithPrecision(float inFloat);
 
-	UFUNCTION(BlueprintPure, Category = "ExtraWindowUI")
+	UFUNCTION(BlueprintPure, Category = "ExtraWindow")
 		static FVector2D GetWINCursorPosition();
 
-	UFUNCTION(BlueprintPure, Category = "ExtraWindowUI")
+	UFUNCTION(BlueprintPure, Category = "ExtraWindow")
 		static bool GetWINLeftMouseButtonDown();
 
 	UFUNCTION(BlueprintCallable, Category = "Extra Window|UI")
@@ -41,11 +41,11 @@ public:
 
 private:
 
-	UGameViewportClient* ExtraWindowUIViewportClient;
-	TSharedPtr<FSceneViewport> ExtraWindowUISceneViewport;
+	UGameViewportClient* ExtraWindowViewportClient;
+	TSharedPtr<FSceneViewport> ExtraWindowSceneViewport;
 	FNumberFormattingOptions NumberFormat;
 	FVector2D GameWindowLocation;
 	FVector2D GameWindowSize;
 
-	void OnExtraWindowUIClosed(const TSharedRef<SWindow>& WindowBeingClosed);
+	void OnExtraWindowWindowClosed(const TSharedRef<SWindow>& WindowBeingClosed);
 };
