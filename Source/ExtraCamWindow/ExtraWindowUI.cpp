@@ -1,14 +1,5 @@
 #include "IExtraWindowPlugin.h"
 #include "ExtraWindowUI.h"
-#include "ExtraWindowGameInstance.h"
-
-UExtraWindowUI::UExtraWindowUI(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
-{
-	NumberFormat.MinimumIntegralDigits = 1;
-	NumberFormat.MaximumIntegralDigits = 11111111;
-	NumberFormat.MinimumFractionalDigits = 3;
-	NumberFormat.MaximumFractionalDigits = 3;
-}
 
 void UExtraWindowUI::GetResolutionMonitor(bool isNoMainViewport, FVector2D& Position, FVector2D& Resolution)
 {
@@ -48,15 +39,30 @@ void UExtraWindowUI::GetResolutionMonitor(bool isNoMainViewport, FVector2D& Posi
 	}
 }
 
-bool UExtraWindowUI::CreateExtraWindowUIWindow()
+UExtraWindowUI::UExtraWindowUI(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	//set Float precision for displaying values
+	NumberFormat.MinimumIntegralDigits = 1;
+	NumberFormat.MaximumIntegralDigits = 11111111;
+	NumberFormat.MinimumFractionalDigits = 3;
+	NumberFormat.MaximumFractionalDigits = 3;
+}
+
+void UExtraWindowUI::CloseExtraWindowUI() {
+	if (ExtraWindowUIViewportClient != nullptr) {
+		ExtraWindowUIViewportClient->GetWindow()->DestroyWindowImmediately();
+	}
+}
+
+bool UExtraWindowUI::CreateExtraWindowUI()
 {
 	bExtraWindowUICreated = false;
 
 	if (GIsClient)
 	{
 		//Initialize GameInstance of new viewport client
-		UExtraWindowGameInstance* ExtraWindowUIGameInstance = NewObject<UExtraWindowGameInstance>(GEngine, UExtraWindowGameInstance::StaticClass());
-		ExtraWindowUIGameInstance->InitializeExtraWindowContext(GetWorld()->GetFirstPlayerController());
+		UExtraWindowUIGameInstance* ExtraWindowUIGameInstance = NewObject<UExtraWindowUIGameInstance>(GEngine, UExtraWindowUIGameInstance::StaticClass());
+		ExtraWindowUIGameInstance->InitializeExtraWindowUIContext(GetWorld()->GetFirstPlayerController());
 
 		//Initialize Viewport Client
 		ExtraWindowUIViewportClient = NewObject<UGameViewportClient>(GEngine, UGameViewportClient::StaticClass());
@@ -87,7 +93,8 @@ bool UExtraWindowUI::CreateExtraWindowUIWindow()
 
 			FSlateApplication::Get().AddWindow(Window, false);
 			Window->SetViewportSizeDrivenByWindow(false);
-			Window->SetOnWindowClosed(FOnWindowClosed::CreateUObject(this, &UExtraWindowUI::OnExtraWindowUIWindowClosed));
+			Window->SetOnWindowClosed(FOnWindowClosed::CreateUObject(this, &UExtraWindowUI::OnExtraWindowUIClosed));
+			//Window->SetRequestDestroyWindowOverride(FOnWindowClosed::CreateUObject(this, &UExtraWindowUI::OnExtraWindowUIClosed));
 
 			// Attach the viewport client to a new viewport.
 			TSharedRef<SOverlay> ViewportOverlayWidgetRef = SNew(SOverlay);
@@ -129,7 +136,6 @@ bool UExtraWindowUI::CreateExtraWindowUIWindow()
 				[
 					UserSlateWidget.ToSharedRef()
 				];
-
 			ExtraWindowUIViewportClient->AddViewportWidgetContent(ViewportWidget, 10);
 
 			ExtraWindowUIViewportClient->SetCaptureMouseOnClick(EMouseCaptureMode::NoCapture);
@@ -146,11 +152,12 @@ bool UExtraWindowUI::CreateExtraWindowUIWindow()
 	return bExtraWindowUICreated;
 }
 
-void UExtraWindowUI::OnExtraWindowUIWindowClosed(const TSharedRef<SWindow>& WindowBeingClosed)
+void UExtraWindowUI::OnExtraWindowUIClosed(const TSharedRef<SWindow>& WindowBeingClosed)
 {
-
 	ExtraWindowUIViewportClient->CloseRequested(ExtraWindowUISceneViewport->GetViewport());
 	ExtraWindowUISceneViewport.Reset();
+
+	CloseExtraWindowUI();
 
 	ExtraWindowUIViewportClient = NULL;
 	ExtraWindowUISceneViewport = NULL;

@@ -4,6 +4,8 @@
 #include "Blueprint/UserWidget.h"
 #include "ExtraWindowGameManager.generated.h"
 
+class UExtraWindowUI;
+
 UCLASS()
 class AExtraWindowGameManager : public AActor
 {
@@ -20,11 +22,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Extra Window|Game Manager")
 		bool bRunning;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Extra Window|Game Manager")
+		UExtraWindowUI* ExtraWindowUI;
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Extra Window|Game Manager")
 		float StopGame();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Extra Window|Game Manager")
-		int32 GraphicsQuality = 3;
+		int32 GraphicsQuality = 6;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Extra Window|Game Manager|Window")
 		UUserWidget* GameWindowHiddenWidget;

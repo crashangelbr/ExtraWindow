@@ -16,27 +16,28 @@ class UExtraWindowUI : public UUserWidget
 		UExtraWindowUI(const FObjectInitializer& ObjectInitializer);
 
 public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Extra Window|UI")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ExtraWindowUI")
 		bool bExtraWindowUICreated;
 
-	UFUNCTION(BlueprintCallable, Category = "Extra Window|UI")
-		bool CreateExtraWindowUIWindow();
+	UFUNCTION(BlueprintCallable, Category = "ExtraWindowUI")
+		bool CreateExtraWindowUI();
 
-	UFUNCTION(BlueprintCallable, Category = "Extra Window|UI")
+	UFUNCTION(BlueprintCallable, Category = "ExtraWindowUI")
 		void UpdateExtraWindowUI(float DeltaSeconds);
 
-	UFUNCTION(BlueprintPure, Category = "Extra Window|UI")
+	UFUNCTION(BlueprintPure, Category = "ExtraWindowUI")
 		FText GetFloatAsTextWithPrecision(float inFloat);
 
-	UFUNCTION(BlueprintPure, Category = "Extra Window|UI")
+	UFUNCTION(BlueprintPure, Category = "ExtraWindowUI")
 		static FVector2D GetWINCursorPosition();
 
-	UFUNCTION(BlueprintPure, Category = "Extra Window|UI")
+	UFUNCTION(BlueprintPure, Category = "ExtraWindowUI")
 		static bool GetWINLeftMouseButtonDown();
 
 	UFUNCTION(BlueprintCallable, Category = "Extra Window|UI")
 		static void GetResolutionMonitor(bool isSecondMonitor, FVector2D& MonitorPosition, FVector2D& MonitorResolution);
+
+	void CloseExtraWindowUI();
 
 private:
 
@@ -46,5 +47,5 @@ private:
 	FVector2D GameWindowLocation;
 	FVector2D GameWindowSize;
 
-	void OnExtraWindowUIWindowClosed(const TSharedRef<SWindow>& WindowBeingClosed);
+	void OnExtraWindowUIClosed(const TSharedRef<SWindow>& WindowBeingClosed);
 };

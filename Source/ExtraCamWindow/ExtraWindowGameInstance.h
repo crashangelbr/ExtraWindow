@@ -1,3 +1,5 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #pragma once
 
 #include "Engine/GameInstance.h"
@@ -7,18 +9,24 @@
 class UExtraWindowUI;
 
 UCLASS()
-class UExtraWindowGameInstance : public UGameInstance
+class UExtraWindowUIGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
+protected:
+
+#if WITH_EDITOR
+		virtual void Shutdown() override;
+#endif
+
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Extra Window|Game Instance")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Manager")
 		UExtraWindowUI* ExtraWindowUI;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Extra Window|Game Instance")
-		AExtraWindowGameManager* GameManager;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Manager")
+		AExtraWindowGameManager* ExtraWindowGameManager;
 
-	UFUNCTION(BlueprintCallable, BlueprintCallable, Category = "Extra Window|Game Instance")
-		void InitializeExtraWindowContext(APlayerController* controller);
+	void InitializeExtraWindowUIContext(APlayerController* controller);
+
 };
